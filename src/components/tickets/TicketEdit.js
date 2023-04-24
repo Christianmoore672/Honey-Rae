@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom"
 export const TicketEdit = () => {
     // TODO: This state object should not be blank
    const [ticket, assignTicket] = useState({
-            //// description: "",
-            //// emergency: false
+            description: "",
+            emergency: false
     })
 
     // TODO: What is the variable in which you stored the route parameter?

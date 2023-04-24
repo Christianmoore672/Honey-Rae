@@ -2,9 +2,11 @@ import { useEffect, useState } from "react"
 import "./tickets.css"
 import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
+import { Ticket } from "./Ticket"
 
 export const TicketList = ({ searchTermState }) => {
     const [tickets, setTickets] = useState([])
+    const [employees, setEmployees] = useState([])
     const [filteredTickets, setFiltered] = useState([])
     const [emergency, setEmergency] = useState(false)
     const [openOnly, updateOpenOnly] = useState(false)
@@ -37,13 +39,22 @@ useEffect(
     },
     [emergency]
 )
+    const getAllTickets = () => {
+        fetch(`http://localhost:8088/serviceTickets?_embed=employeeTickets`)
+        .then(response => response.json())
+        .then((ticketArray) => {
+            setTickets(ticketArray)
+        })
+    }
 
     useEffect(
         () => {
-            fetch(`http://localhost:8088/serviceTickets`)
+                getAllTickets()
+
+                fetch(`http://localhost:8088/serviceTickets?_expand=user`)
                 .then(response => response.json())
-                .then((ticketArray) => {
-                    setTickets(ticketArray)
+                .then((employeeArray) => {
+                    setEmployees(employeeArray)
                 })
             // console.log("Initial state of tickets", tickets) // View the initial state of tickets
         },
@@ -100,15 +111,10 @@ useEffect(
     <article className="tickets">
         {
             filteredTickets.map(
-                (ticket) => {
-                    return <section className="ticket" key={`ticket--${ticket.id}`}>
-                    <header>
-                         <Link to={`/tickets/${ticket.id}/edit`}>Ticket {ticket.id}</Link>
-                    </header>
-                    <section>{ticket.description}</section>
-                    <footer>Emergency: {ticket.emergency ? "🧨" : "No"}</footer>
-                    </section>
-                }
+                (ticket) => <Ticket employees={employees} 
+                getAllTickets={getAllTickets}
+                currentUser={honeyUserObject} 
+                ticketObject={ticket} />
             )
         }
     </article>
